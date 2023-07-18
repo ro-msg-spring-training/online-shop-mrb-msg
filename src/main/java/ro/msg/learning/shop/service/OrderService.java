@@ -30,7 +30,10 @@ public class OrderService {
             //TODO add exception
         }
 
-        updateStock();
+        orderDto.getProducts().forEach(p -> {
+            availableStocks.forEach(s -> updateStock(s, p.getQuantity()));
+        });
+
 
         Order order = Order.builder()
                 .createdOn(orderDto.getCreatedOn())
@@ -84,8 +87,14 @@ public class OrderService {
 
     }
 
-    private void updateStock() {
+    private void updateStock(StockDto stockDto, Integer quantity) {
 
+        Stock stockToUpdate = stockRepository.findByProductAndLocation(stockDto.getProduct(), stockDto.getLocation());
+
+        Integer quantityToUpdate = stockToUpdate.getQuantity() - quantity;
+        stockToUpdate.setQuantity(quantityToUpdate);
+
+        stockRepository.save(stockToUpdate);
     }
 }
 
