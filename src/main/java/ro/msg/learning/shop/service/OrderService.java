@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ro.msg.learning.shop.dto.OrderDto;
 import ro.msg.learning.shop.dto.StockDto;
+import ro.msg.learning.shop.exception.NoStocksAvailableException;
 import ro.msg.learning.shop.model.Address;
 import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.Stock;
@@ -27,13 +28,12 @@ public class OrderService {
         List<StockDto> availableStocks = findLocationWithStock(orderDto);
 
         if (availableStocks.isEmpty()) {
-            //TODO add exception
+            throw new NoStocksAvailableException();
         }
 
         orderDto.getProducts().forEach(p -> {
             availableStocks.forEach(s -> updateStock(s, p.getQuantity()));
         });
-
 
         Order order = Order.builder()
                 .createdOn(orderDto.getCreatedOn())
@@ -47,7 +47,6 @@ public class OrderService {
         orderRepository.save(order);
 
         return order;
-
 
     }
 
