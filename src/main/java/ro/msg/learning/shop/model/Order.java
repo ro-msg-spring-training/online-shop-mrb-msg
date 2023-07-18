@@ -1,10 +1,7 @@
 package ro.msg.learning.shop.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @Table(name = "Orders")
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Builder
 public class Order extends BaseEntity {
 
     @Column(nullable = false)

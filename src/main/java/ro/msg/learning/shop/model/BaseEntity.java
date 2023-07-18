@@ -15,4 +15,8 @@ public class BaseEntity {
     public BaseEntity() {
         this.id = UUID.randomUUID();
     }
+
+    public UUID getId() {
+        return id;
+    }
 }
