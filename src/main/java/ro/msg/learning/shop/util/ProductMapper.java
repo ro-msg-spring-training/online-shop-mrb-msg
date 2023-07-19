@@ -3,9 +3,7 @@ package ro.msg.learning.shop.util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ro.msg.learning.shop.dto.ProductDto;
-import ro.msg.learning.shop.model.Category;
 import ro.msg.learning.shop.model.Product;
-import ro.msg.learning.shop.model.Supplier;
 
 @RequiredArgsConstructor
 @Component
