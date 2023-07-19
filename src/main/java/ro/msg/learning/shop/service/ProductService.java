@@ -2,10 +2,7 @@ package ro.msg.learning.shop.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ro.msg.learning.shop.dto.ProductDto;
-import ro.msg.learning.shop.model.Category;
 import ro.msg.learning.shop.model.Product;
-import ro.msg.learning.shop.model.Supplier;
 import ro.msg.learning.shop.repository.CategoryRepository;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.SupplierRepository;
@@ -23,30 +20,27 @@ public class ProductService {
     private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
 
-    public Product createProduct(ProductDto productDto) {
+    public Product createProduct(Product product, UUID categoryId, UUID supplierId) {
 
-        Category category = categoryRepository.findById(productDto.getCategoryId()).get();
-        Supplier supplier = supplierRepository.findById(productDto.getSupplierId()).get();
+        product.setCategory(categoryRepository.findById(categoryId).get());
+        product.setSupplier(supplierRepository.findById(supplierId).get());
 
-        return productRepository.save(productMapper.toEntity(productDto, category, supplier));
+        return productRepository.save(product);
 
     }
 
-    public Product updateProduct(UUID id, ProductDto productDto) {
+    public Product updateProduct(UUID id, Product product, UUID categoryId, UUID supplierId) {
 
-        Category category = categoryRepository.findById(productDto.getCategoryId()).get();
-        Supplier supplier = supplierRepository.findById(productDto.getSupplierId()).get();
+        Product toBeUpdated = productRepository.findById(id).get();
 
-        Product product = productRepository.findById(id).get();
+        toBeUpdated.setName(product.getName());
+        toBeUpdated.setDescription(product.getDescription());
+        toBeUpdated.setPrice(product.getPrice());
+        toBeUpdated.setWeight(product.getWeight());
+        toBeUpdated.setCategory(categoryRepository.findById(categoryId).get());
+        toBeUpdated.setSupplier(supplierRepository.findById(supplierId).get());
 
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setPrice(productDto.getPrice());
-        product.setWeight(productDto.getWeight());
-        product.setCategory(category);
-        product.setSupplier(supplier);
-
-        return productRepository.save(product);
+        return productRepository.save(toBeUpdated);
 
     }
 

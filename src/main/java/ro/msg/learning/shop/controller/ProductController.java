@@ -27,7 +27,8 @@ public class ProductController {
     @PostMapping
     public ProductDto createProduct(@RequestBody ProductDto productDto) {
 
-        return productMapper.toDto(productService.createProduct(productDto));
+        return productMapper.toDto(
+                productService.createProduct(productMapper.toEntity(productDto), productDto.getCategoryId(), productDto.getSupplierId()));
     }
 
     @GetMapping
@@ -49,11 +50,11 @@ public class ProductController {
         productService.deleteProduct(id);
     }
 
-    @PutMapping
-    public ProductDto updateProduct(@RequestBody ProductDto productDto) {
+    @PutMapping("/{id}")
+    public ProductDto updateProduct(@PathVariable UUID id, @RequestBody ProductDto productDto) {
 
-        UUID id = productService.readById(productDto.getId()).getId();
-        return productMapper.toDto(productService.updateProduct(id, productDto));
+        return productMapper.toDto(
+                productService.updateProduct(id, productMapper.toEntity(productDto), productDto.getCategoryId(), productDto.getSupplierId()));
     }
 
 }

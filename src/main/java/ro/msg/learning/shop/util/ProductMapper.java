@@ -11,14 +11,12 @@ import ro.msg.learning.shop.model.Supplier;
 @Component
 public class ProductMapper {
 
-    public Product toEntity(ProductDto productDto, Category category, Supplier supplier) {
+    public Product toEntity(ProductDto productDto) {
         return Product.builder()
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
                 .weight(productDto.getWeight())
-                .category(category)
-                .supplier(supplier)
                 .build();
     }
 

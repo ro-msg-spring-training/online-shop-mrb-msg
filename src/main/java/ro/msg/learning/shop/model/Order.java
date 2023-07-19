@@ -1,6 +1,7 @@
 package ro.msg.learning.shop.model;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -12,13 +13,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "Orders")
 @AllArgsConstructor
@@ -33,8 +38,8 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "customer")
     private Customer customer;
 
-    @OneToMany(mappedBy = "order")
-    private List<Product> products;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private Set<OrderDetail> orderDetails;
 
     @Embedded
     private Address deliveryAddress;

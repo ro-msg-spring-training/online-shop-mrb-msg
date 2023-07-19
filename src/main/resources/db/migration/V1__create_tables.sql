@@ -28,12 +28,20 @@ CREATE TABLE Products(
         description VARCHAR(1000),
         price FLOAT NOT NULL,
         weight FLOAT NOT NULL,
-        category UUID,
-        order_id UUID,
+        category_id UUID,
         supplier_id UUID,
-        FOREIGN KEY(category) REFERENCES Categories(id),
-        FOREIGN KEY(order_id) REFERENCES Orders(id),
+        FOREIGN KEY(category_id) REFERENCES Categories(id),
         FOREIGN KEY(supplier_id) REFERENCES Suppliers(id));
+
+CREATE TABLE Order_Details(
+        id UUID PRIMARY KEY,
+        order_id UUID,
+        product_id UUID,
+        quantity INTEGER,
+        FOREIGN KEY(order_id) REFERENCES Orders(id),
+        FOREIGN KEY (product_id) REFERENCES Products(id)
+);
+
 
 CREATE TABLE Addresses(
        id UUID PRIMARY KEY,

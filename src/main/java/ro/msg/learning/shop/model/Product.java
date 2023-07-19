@@ -32,15 +32,11 @@ public class Product extends BaseEntity {
     private Double weight;
 
     @ManyToOne
-    @JoinColumn(name = "category")
+    @JoinColumn(name = "category_id")
     private Category category;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
-    
+
 }
