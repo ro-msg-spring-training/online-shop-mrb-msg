@@ -17,18 +17,22 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Order_Details")
 @Builder
-@Table(name = "Stocks")
-public class Stock extends BaseEntity {
+public class OrderDetail extends BaseEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
-
     private Integer quantity;
 
+    public OrderDetail(Product product, Integer quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
 }
