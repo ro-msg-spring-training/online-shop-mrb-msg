@@ -26,7 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "Orders")
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = "orderDetails")
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Builder
 public class Order extends BaseEntity {
 
