@@ -1,6 +1,7 @@
 package ro.msg.learning.shop.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -25,7 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "Orders")
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "orderDetails")
 @Builder
 public class Order extends BaseEntity {
 
@@ -37,10 +38,14 @@ public class Order extends BaseEntity {
     private Customer customer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<OrderDetail> orderDetails;
 
     @Embedded
     private Address deliveryAddress;
 
-
+    public void setOrderDetails(Set<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+        orderDetails.forEach(od -> od.setOrder(this));
+    }
 }

@@ -2,6 +2,7 @@ package ro.msg.learning.shop.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.exception.NoStocksAvailableException;
@@ -31,6 +32,7 @@ public class OrderService {
     private final OrderDetailsRepository orderDetailsRepository;
 
 
+    @Transactional
     public Order createOrder(Order order, List<ProductQuantityDto> products) {
 
         List<StockDto> availableStocks = findLocationWithStock(products);
@@ -43,6 +45,11 @@ public class OrderService {
                 .map(p -> new OrderDetail(productRepository.findById(p.getProductId()).get(), p.getQuantity()))
                 .collect(Collectors.toSet());
 
+        Order toBeSaved = new Order();
+        toBeSaved.setCreatedOn(order.getCreatedOn());
+        toBeSaved.setOrderDetails(orderDetails);
+        toBeSaved.setDeliveryAddress(order.getDeliveryAddress());
+
         products.forEach(p -> {
             availableStocks.forEach(s -> {
                 if (p.getProductId().equals(s.getProduct().getId())) {
@@ -51,19 +58,7 @@ public class OrderService {
             });
         });
 
-        Order toBeSaved = Order.builder()
-                .createdOn(order.getCreatedOn())
-                .deliveryAddress(order.getDeliveryAddress())
-                .build();
-
-        Order finalOrder = orderRepository.save(toBeSaved);
-
-        orderDetails.forEach(o -> {
-            o.setOrder(finalOrder);
-            orderDetailsRepository.save(o);
-        });
-
-        return finalOrder;
+        return orderRepository.save(toBeSaved);
 
     }
 
