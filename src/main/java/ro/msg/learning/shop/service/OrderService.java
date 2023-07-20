@@ -1,6 +1,6 @@
 package ro.msg.learning.shop.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
@@ -9,11 +9,12 @@ import ro.msg.learning.shop.exception.NoStocksAvailableException;
 import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.OrderDetail;
 import ro.msg.learning.shop.model.Stock;
-import ro.msg.learning.shop.repository.OrderDetailsRepository;
 import ro.msg.learning.shop.repository.OrderRepository;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.LocationStrategy;
+import ro.msg.learning.shop.strategy.MostAbundantStrategy;
+import ro.msg.learning.shop.strategy.SingleLocationStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -32,6 +32,16 @@ public class OrderService {
     private final StockRepository stockRepository;
     private final LocationStrategy locationStrategy;
 
+    public OrderService(@Value("${strategy.type}") String strategyType, OrderRepository orderRepository, ProductRepository productRepository, StockRepository stockRepository) {
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+        this.stockRepository = stockRepository;
+        switch (strategyType) {
+            case "SINGLE" -> locationStrategy = new SingleLocationStrategy(stockRepository, productRepository);
+            case "ABUNDANT" -> locationStrategy = new MostAbundantStrategy(stockRepository, productRepository);
+            default -> throw new NoStocksAvailableException();
+        }
+    }
 
     @Transactional
     public Order createOrder(Order order, List<ProductQuantityDto> products) {
