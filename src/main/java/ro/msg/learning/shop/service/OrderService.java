@@ -13,6 +13,7 @@ import ro.msg.learning.shop.repository.OrderDetailsRepository;
 import ro.msg.learning.shop.repository.OrderRepository;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.StockRepository;
+import ro.msg.learning.shop.strategy.LocationStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +30,15 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
-    private final OrderDetailsRepository orderDetailsRepository;
+    private final LocationStrategy locationStrategy;
 
 
     @Transactional
     public Order createOrder(Order order, List<ProductQuantityDto> products) {
 
-        List<StockDto> availableStocks = findLocationWithStock(products);
+//        List<StockDto> availableStocks = findLocationWithStock(products);
+
+        List<StockDto> availableStocks = locationStrategy.findLocation(products);
 
         if (availableStocks.isEmpty()) {
             throw new NoStocksAvailableException();
@@ -79,7 +82,7 @@ public class OrderService {
                 if (list == null) {
                     list = new ArrayList<>();
                 }
-                list.add(new StockDto(stock.getProduct(), stock.getLocation(), stock.getQuantity()));
+                list.add(new StockDto(stock.getProduct(), stock.getLocation(), p.getQuantity()));
                 map.put(stock.getLocation().getId(), list);
 
             });
