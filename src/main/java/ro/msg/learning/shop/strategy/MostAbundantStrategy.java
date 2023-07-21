@@ -3,7 +3,6 @@ package ro.msg.learning.shop.strategy;
 import lombok.AllArgsConstructor;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
-import ro.msg.learning.shop.exception.NoStocksAvailableException;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.StockRepository;
@@ -32,13 +31,9 @@ public class MostAbundantStrategy implements LocationStrategy {
             List<Stock> availableStocks = stockRepository.findByProductAndQuantity(
                     productRepository.findById(p.getProductId()).get(), p.getQuantity());
 
-//            if (availableStocks.isEmpty() || availableStocks.size() < products.size()) {
-//                throw new NoStocksAvailableException();
-//            }
-
             availableStocks.forEach(s -> {
 
-                StockDto stockDto = map.get(p.getProductId()); //pentru UUID am luat value din map, adica stock
+                StockDto stockDto = map.get(p.getProductId());
 
                 if (!map.containsKey(p.getProductId()))
                     map.put(p.getProductId(), stockMapper.toDto(s));
