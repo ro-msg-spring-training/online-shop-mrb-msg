@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.exception.NoStocksAvailableException;
+import ro.msg.learning.shop.exception.ResourceNotFoundException;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.StockRepository;
@@ -27,10 +28,12 @@ public class SingleLocationStrategy implements LocationStrategy {
 
         products.forEach(p -> {
 
-            List<Stock> stocks = stockRepository.findByProductAndQuantity(productRepository.findById(p.getProductId()).get(), p.getQuantity());
+            List<Stock> stocks = stockRepository.findByProductAndQuantity(
+                    productRepository.findById(p.getProductId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found")), p.getQuantity());
 
             if (stocks.isEmpty()) {
-                throw new NoStocksAvailableException();
+                throw new NoStocksAvailableException("No stocks available");
             }
 
             stocks.forEach(stock -> {

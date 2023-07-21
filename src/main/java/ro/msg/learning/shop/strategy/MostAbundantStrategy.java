@@ -3,6 +3,7 @@ package ro.msg.learning.shop.strategy;
 import lombok.AllArgsConstructor;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
+import ro.msg.learning.shop.exception.ResourceNotFoundException;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.ProductRepository;
 import ro.msg.learning.shop.repository.StockRepository;
@@ -29,7 +30,8 @@ public class MostAbundantStrategy implements LocationStrategy {
         products.forEach(p -> {
 
             List<Stock> availableStocks = stockRepository.findByProductAndQuantity(
-                    productRepository.findById(p.getProductId()).get(), p.getQuantity());
+                    productRepository.findById(p.getProductId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Product not found")), p.getQuantity());
 
             availableStocks.forEach(s -> {
 
