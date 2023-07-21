@@ -6,8 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.exception.NoStocksAvailableException;
+import ro.msg.learning.shop.model.Location;
 import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.OrderDetail;
+import ro.msg.learning.shop.model.Product;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.OrderRepository;
 import ro.msg.learning.shop.repository.ProductRepository;
@@ -15,9 +17,11 @@ import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.LocationStrategy;
 import ro.msg.learning.shop.strategy.MostAbundantStrategy;
 import ro.msg.learning.shop.strategy.SingleLocationStrategy;
+import ro.msg.learning.shop.util.StockMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,13 +36,17 @@ public class OrderService {
     private final StockRepository stockRepository;
     private final LocationStrategy locationStrategy;
 
-    public OrderService(@Value("${strategy.type}") String strategyType, OrderRepository orderRepository, ProductRepository productRepository, StockRepository stockRepository) {
+    private final StockMapper stockMapper;
+
+    public OrderService(@Value("${strategy.type}") String strategyType, OrderRepository orderRepository, ProductRepository productRepository, StockRepository stockRepository, StockMapper stockMapper) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.stockRepository = stockRepository;
+        this.stockMapper = stockMapper;
         switch (strategyType) {
             case "SINGLE" -> locationStrategy = new SingleLocationStrategy(stockRepository, productRepository);
-            case "ABUNDANT" -> locationStrategy = new MostAbundantStrategy(stockRepository, productRepository);
+            case "ABUNDANT" ->
+                    locationStrategy = new MostAbundantStrategy(stockRepository, productRepository, stockMapper);
             default -> throw new NoStocksAvailableException();
         }
     }
@@ -46,78 +54,82 @@ public class OrderService {
     @Transactional
     public Order createOrder(Order order, List<ProductQuantityDto> products) {
 
-//        List<StockDto> availableStocks = findLocationWithStock(products);
+        List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(products);
 
-        List<StockDto> availableStocks = locationStrategy.findLocation(products);
-
-        if (availableStocks.isEmpty()) {
+        if (stocksToBeOrdered.isEmpty()) {
             throw new NoStocksAvailableException();
         }
 
-        Set<OrderDetail> orderDetails = products.stream()
-                .map(p -> new OrderDetail(productRepository.findById(p.getProductId()).get(), p.getQuantity()))
-                .collect(Collectors.toSet());
+        Set<OrderDetail> orderDetails = new HashSet<>();
 
-        Order toBeSaved = new Order();
-        toBeSaved.setCreatedOn(order.getCreatedOn());
-        toBeSaved.setOrderDetails(orderDetails);
-        toBeSaved.setDeliveryAddress(order.getDeliveryAddress());
-
-        products.forEach(p -> {
-            availableStocks.forEach(s -> {
-                if (p.getProductId().equals(s.getProduct().getId())) {
-                    updateStock(s, p.getQuantity());
+        stocksToBeOrdered.forEach(stock -> {
+            products.forEach(product -> {
+                if (stock.getProduct().getId().equals(product.getProductId())) {
+                    orderDetails.add(new OrderDetail(stock.getProduct(), product.getQuantity()));
                 }
             });
         });
 
-        return orderRepository.save(toBeSaved);
+            Order toBeSaved = new Order();
+            toBeSaved.setCreatedOn(order.getCreatedOn());
+            toBeSaved.setOrderDetails(orderDetails);
+            toBeSaved.setDeliveryAddress(order.getDeliveryAddress());
 
-    }
-
-    private List<StockDto> findLocationWithStock(List<ProductQuantityDto> products) {
-
-        Map<UUID, List<StockDto>> map = new HashMap<>();
-
-        products.forEach(p -> {
-
-            List<Stock> stocks = stockRepository.findByProductAndQuantity(productRepository.findById(p.getProductId()).get(), p.getQuantity());
-
-            if (stocks.isEmpty()) {
-                throw new NoStocksAvailableException();
-            }
-
-            stocks.forEach(stock -> {
-                List<StockDto> list = map.get(stock.getLocation().getId());
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
-                list.add(new StockDto(stock.getProduct(), stock.getLocation(), p.getQuantity()));
-                map.put(stock.getLocation().getId(), list);
-
+            products.forEach(p -> {
+                stocksToBeOrdered.forEach(s -> {
+                    if (p.getProductId().equals(s.getProduct().getId())) {
+                        updateStock(s, p.getQuantity());
+                    }
+                });
             });
-        });
 
-        for (Map.Entry<UUID, List<StockDto>> entry : map.entrySet()) {
-            if (entry.getValue().size() == products.size()) {
-                return entry.getValue();
-            }
+            return orderRepository.save(toBeSaved);
 
         }
 
-        return new ArrayList<>();
+        private List<StockDto> findLocationWithStock (List < ProductQuantityDto > products) {
 
+            Map<UUID, List<StockDto>> map = new HashMap<>();
+
+            products.forEach(p -> {
+
+                List<Stock> stocks = stockRepository.findByProductAndQuantity(productRepository.findById(p.getProductId()).get(), p.getQuantity());
+
+                if (stocks.isEmpty()) {
+                    throw new NoStocksAvailableException();
+                }
+
+                stocks.forEach(stock -> {
+                    List<StockDto> list = map.get(stock.getLocation().getId());
+                    if (list == null) {
+                        list = new ArrayList<>();
+                    }
+                    list.add(new StockDto(stock.getProduct(), stock.getLocation(), p.getQuantity()));
+                    map.put(stock.getLocation().getId(), list);
+
+                });
+            });
+
+            for (Map.Entry<UUID, List<StockDto>> entry : map.entrySet()) {
+                if (entry.getValue().size() == products.size()) {
+                    return entry.getValue();
+                }
+
+            }
+
+            return new ArrayList<>();
+
+        }
+
+        private void updateStock (StockDto stockDto, Integer quantity){
+
+            Stock stockToUpdate = stockRepository.findByProductAndLocation(stockDto.getProduct(), stockDto.getLocation());
+
+            Integer quantityToUpdate = stockToUpdate.getQuantity() - quantity;
+            stockToUpdate.setQuantity(quantityToUpdate);
+
+            stockRepository.save(stockToUpdate);
+        }
     }
-
-    private void updateStock(StockDto stockDto, Integer quantity) {
-
-        Stock stockToUpdate = stockRepository.findByProductAndLocation(stockDto.getProduct(), stockDto.getLocation());
-
-        Integer quantityToUpdate = stockToUpdate.getQuantity() - quantity;
-        stockToUpdate.setQuantity(quantityToUpdate);
-
-        stockRepository.save(stockToUpdate);
-    }
-}
 
 

@@ -17,4 +17,7 @@ public interface StockRepository extends JpaRepository<Stock, UUID> {
     List<Stock> findByProductAndQuantity(Product product, Integer quantity);
 
     Stock findByProductAndLocation(Product product, Location location);
+
+    @Query(value = "SELECT s FROM Stock s WHERE s.product = :product")
+    Stock findByProduct(Product product);
 }

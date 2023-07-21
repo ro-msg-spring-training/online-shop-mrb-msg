@@ -40,7 +40,6 @@ public class SingleLocationStrategy implements LocationStrategy {
                 }
                 list.add(new StockDto(stock.getProduct(), stock.getLocation(), p.getQuantity()));
                 map.put(stock.getLocation().getId(), list);
-
             });
         });
 
@@ -48,7 +47,6 @@ public class SingleLocationStrategy implements LocationStrategy {
             if (entry.getValue().size() == products.size()) {
                 return entry.getValue();
             }
-
         }
 
         return new ArrayList<>();
