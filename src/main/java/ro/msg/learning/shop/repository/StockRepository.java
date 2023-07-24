@@ -22,7 +22,5 @@ public interface StockRepository extends JpaRepository<Stock, UUID> {
     @Query(value = "SELECT s FROM Stock s WHERE s.product.id = :uuid AND s.quantity >= :quantity ORDER BY s.quantity DESC LIMIT 1")
     Stock findByProductIdAndQuantityMostAbundant(@Param("uuid") UUID uuid, @Param("quantity") Integer quantity);
 
-
-    @Query(value = "SELECT s FROM Stock s WHERE s.location.id = :uuid")
-    List<Stock> findAllByLocationId(@Param("uuid") UUID id);
+    List<Stock> findAllByLocationId(UUID id);
 }
