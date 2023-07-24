@@ -2,6 +2,7 @@ package ro.msg.learning.shop.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ro.msg.learning.shop.exception.ResourceNotFoundException;
 import ro.msg.learning.shop.model.Product;
 import ro.msg.learning.shop.repository.CategoryRepository;
 import ro.msg.learning.shop.repository.ProductRepository;
@@ -22,8 +23,8 @@ public class ProductService {
 
     public Product createProduct(Product product, UUID categoryId, UUID supplierId) {
 
-        product.setCategory(categoryRepository.findById(categoryId).get());
-        product.setSupplier(supplierRepository.findById(supplierId).get());
+        product.setCategory(categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+        product.setSupplier(supplierRepository.findById(supplierId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
 
         return productRepository.save(product);
 
@@ -31,14 +32,14 @@ public class ProductService {
 
     public Product updateProduct(UUID id, Product product, UUID categoryId, UUID supplierId) {
 
-        Product toBeUpdated = productRepository.findById(id).get();
+        Product toBeUpdated = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         toBeUpdated.setName(product.getName());
         toBeUpdated.setDescription(product.getDescription());
         toBeUpdated.setPrice(product.getPrice());
         toBeUpdated.setWeight(product.getWeight());
-        toBeUpdated.setCategory(categoryRepository.findById(categoryId).get());
-        toBeUpdated.setSupplier(supplierRepository.findById(supplierId).get());
+        toBeUpdated.setCategory(categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+        toBeUpdated.setSupplier(supplierRepository.findById(supplierId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
 
         return productRepository.save(toBeUpdated);
 
@@ -52,7 +53,7 @@ public class ProductService {
 
     public Product readById(UUID id) {
 
-        return productRepository.findById(id).get();
+        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
     }
 
     public List<Product> readAllProducts() {
