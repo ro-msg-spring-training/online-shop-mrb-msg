@@ -39,4 +39,7 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
+    public Product(String name) {
+        this.name = name;
+    }
 }

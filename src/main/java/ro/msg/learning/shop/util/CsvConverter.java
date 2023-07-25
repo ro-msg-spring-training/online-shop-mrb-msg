@@ -3,12 +3,14 @@ package ro.msg.learning.shop.util;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+@Component
 public class CsvConverter {
 
     private static final CsvMapper mapper = new CsvMapper();
