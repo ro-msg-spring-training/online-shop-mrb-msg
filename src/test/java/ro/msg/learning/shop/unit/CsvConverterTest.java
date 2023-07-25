@@ -37,21 +37,21 @@ class CsvConverterTest {
     @Test
     void toCsv_withMultipleStocks_shouldConvertToCsvWithStocks() throws IOException {
         var outputStream = new ByteArrayOutputStream();
-        csvConverter.toCsv(StockDto.class, generateStockList(), outputStream);
+        CsvConverter.toCsv(StockDto.class, generateStockList(), outputStream);
         assertThat(outputStream).hasToString(CSV_AS_STRING);
     }
 
     @Test
     void toCsv_withNoStock_shouldConvertToCsvWithStockZero() throws IOException {
         var outputStream = new ByteArrayOutputStream();
-        csvConverter.toCsv(StockDto.class, generateStockListWithStockZero(), outputStream);
+        CsvConverter.toCsv(StockDto.class, generateStockListWithStockZero(), outputStream);
         assertThat(outputStream).hasToString(CSV_AS_STRING_NO_STOCKS);
     }
 
     @Test
     void fromCsv_WithEmptyHeader_shouldConvertToEmptyList() throws IOException {
         var inputStream = new ByteArrayInputStream(CSV_HEADER.getBytes());
-        List<StockDto> stockList = csvConverter.fromCsv(StockDto.class, inputStream);
+        List<StockDto> stockList = CsvConverter.fromCsv(StockDto.class, inputStream);
         assertThat(stockList).isEqualTo(List.of());
     }
 

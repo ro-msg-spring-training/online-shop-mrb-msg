@@ -1,7 +1,6 @@
 package ro.msg.learning.shop.unit.strategy;
 
 import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.model.Location;
@@ -14,7 +13,12 @@ import java.util.UUID;
 public abstract class AbstractStrategyTest {
 
     protected List<ProductQuantityDto> orderedProducts;
-    protected List<Stock> resultingStocks;
+
+    protected  Stock resultingStock1;
+    protected Stock resultingStock2;
+    protected List<Stock> resultingStockList1;
+    protected List<Stock> resultingStockList2;
+    protected List<StockDto> expectedResult;
 
 
     @Before
@@ -22,8 +26,8 @@ public abstract class AbstractStrategyTest {
         UUID uuid1 = UUID.randomUUID();
         UUID uuid2 = UUID.randomUUID();
 
-        Product product1 = Product.builder().build();
-        Product product2 = Product.builder().build();
+        Product product1 = Product.builder().name("Bread").price(10.0).weight(100.0).build();
+        Product product2 = Product.builder().name("Cola").price(7.0).weight(250.0).build();
 
         orderedProducts = List.of(
                 ProductQuantityDto.builder().productId(product1.getId()).quantity(10).build(),
@@ -32,9 +36,14 @@ public abstract class AbstractStrategyTest {
 
         Location location = Location.builder().name("TM").build();
 
-        resultingStocks = List.of(
-                Stock.builder().product(product1).quantity(10).location(location).build(),
-                Stock.builder().product(product2).quantity(10).location(location).build());
+        resultingStock1 = Stock.builder().product(product1).quantity(10).location(location).build();
+        resultingStockList1 = List.of(resultingStock1);
 
+        resultingStock2 = Stock.builder().product(product2).quantity(10).location(location).build();
+        resultingStockList2 = List.of(resultingStock2);
+
+        expectedResult = List.of(
+                StockDto.builder().product(product1).location(location).quantity(10).build(),
+                StockDto.builder().product(product2).location(location).quantity(10).build());
     }
 }

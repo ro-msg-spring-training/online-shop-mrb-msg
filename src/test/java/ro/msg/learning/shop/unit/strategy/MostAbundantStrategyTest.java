@@ -9,7 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.repository.StockRepository;
-import ro.msg.learning.shop.strategy.SingleLocationStrategy;
+import ro.msg.learning.shop.strategy.MostAbundantStrategy;
+import ro.msg.learning.shop.util.StockMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,29 +21,31 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SingleLocationStrategyTest extends AbstractStrategyTest{
+public class MostAbundantStrategyTest extends AbstractStrategyTest{
 
     @Mock
     private StockRepository stockRepository;
+
     @InjectMocks
-    private SingleLocationStrategy singleLocationStrategy;
+    private MostAbundantStrategy mostAbundantStrategy;
 
     @BeforeEach
     public void setUp() {
-        singleLocationStrategy = new SingleLocationStrategy(stockRepository);
+        StockMapper stockMapper = new StockMapper();
+        mostAbundantStrategy = new MostAbundantStrategy(stockRepository, stockMapper);
         super.setUp();
     }
+
     @Test
     public void findLocation_StocksFound() {
 
-        when(stockRepository.findByProductIdAndQuantity(any(UUID.class), anyInt()))
-                .thenReturn(resultingStockList1).thenReturn(resultingStockList2);
+        when(stockRepository.findByProductIdAndQuantityMostAbundant(any(UUID.class), anyInt()))
+                .thenReturn(resultingStock1).thenReturn(resultingStock2);
 
-        List<StockDto> actualResult = singleLocationStrategy.findLocation(orderedProducts);
+        List<StockDto> actualResult = mostAbundantStrategy.findLocation(orderedProducts);
 
         assertThat(actualResult).hasSize(expectedResult.size());
         Assertions.assertEquals(actualResult, expectedResult);
 
     }
-
 }
