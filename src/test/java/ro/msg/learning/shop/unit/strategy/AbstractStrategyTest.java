@@ -2,7 +2,6 @@ package ro.msg.learning.shop.unit.strategy;
 
 import org.junit.Before;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
-import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.model.Location;
 import ro.msg.learning.shop.model.Product;
 import ro.msg.learning.shop.model.Stock;
@@ -14,36 +13,54 @@ public abstract class AbstractStrategyTest {
 
     protected List<ProductQuantityDto> orderedProducts;
 
-    protected  Stock resultingStock1;
-    protected Stock resultingStock2;
-    protected List<Stock> resultingStockList1;
-    protected List<Stock> resultingStockList2;
-    protected List<StockDto> expectedResult;
-
+    protected Stock stock1;
+    protected Stock stock2;
+    protected Stock stock3;
+    protected Stock stock4;
+    protected List<Stock> mostAbundantStocks;
+    protected List<Stock> singleLocationStocks;
 
     @Before
     public void setUp() {
         UUID uuid1 = UUID.randomUUID();
         UUID uuid2 = UUID.randomUUID();
 
-        Product product1 = Product.builder().name("Bread").price(10.0).weight(100.0).build();
-        Product product2 = Product.builder().name("Cola").price(7.0).weight(250.0).build();
+        Product bread = Product.builder().name("Bread").price(10.0).weight(100.0).build();
+        Product cola = Product.builder().name("Cola").price(7.0).weight(250.0).build();
 
         orderedProducts = List.of(
-                ProductQuantityDto.builder().productId(product1.getId()).quantity(10).build(),
-                ProductQuantityDto.builder().productId(product2.getId()).quantity(10).build()
+                ProductQuantityDto.builder().productId(bread.getId()).quantity(10).build(),
+                ProductQuantityDto.builder().productId(cola.getId()).quantity(10).build()
         );
 
-        Location location = Location.builder().name("TM").build();
+        Location tm = Location.builder().name("TM").build();
+        Location ar = Location.builder().name("AR").build();
 
-        resultingStock1 = Stock.builder().product(product1).quantity(10).location(location).build();
-        resultingStockList1 = List.of(resultingStock1);
 
-        resultingStock2 = Stock.builder().product(product2).quantity(10).location(location).build();
-        resultingStockList2 = List.of(resultingStock2);
+        stock1 = Stock.builder()
+                .product(bread)
+                .quantity(10)
+                .location(ar)
+                .build();
+        stock2 = Stock.builder()
+                .product(bread)
+                .quantity(11)
+                .location(tm)
+                .build();
+        stock3 = Stock.builder()
+                .product(cola)
+                .quantity(10)
+                .location(ar)
+                .build();
+        stock4 = Stock.builder()
+                .product(cola)
+                .quantity(11)
+                .location(tm)
+                .build();
 
-        expectedResult = List.of(
-                StockDto.builder().product(product1).location(location).quantity(10).build(),
-                StockDto.builder().product(product2).location(location).quantity(10).build());
+        mostAbundantStocks = List.of(stock2, stock4);
+        singleLocationStocks = List.of(stock1, stock3);
+
+
     }
 }

@@ -77,7 +77,7 @@ public class OrderCreationTest {
     }
 
     @Test
-    public void testCreateOrder_withoutStock_shouldCreateOrder() {
+    public void testCreateOrder_withStock_shouldCreateOrder() {
 
         List<ProductQuantityDto> wantedProducts = List.of(ProductQuantityDto.builder().productId(bread.getId()).quantity(1).build());
 

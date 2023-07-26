@@ -29,20 +29,26 @@ public class MostAbundantStrategyTest extends AbstractStrategyTest{
     @InjectMocks
     private MostAbundantStrategy mostAbundantStrategy;
 
+    private StockMapper stockMapper;
+
     @BeforeEach
     public void setUp() {
-        StockMapper stockMapper = new StockMapper();
+        this.stockMapper = new StockMapper();
         mostAbundantStrategy = new MostAbundantStrategy(stockRepository, stockMapper);
         super.setUp();
     }
 
     @Test
-    public void findLocation_StocksFound() {
+    public void testFindStocks_WithAbundantStrategy_MostAbundantStocksFound() {
 
         when(stockRepository.findByProductIdAndQuantityMostAbundant(any(UUID.class), anyInt()))
-                .thenReturn(resultingStock1).thenReturn(resultingStock2);
+                .thenReturn(stock2).thenReturn(stock4);
 
         List<StockDto> actualResult = mostAbundantStrategy.findLocation(orderedProducts);
+
+        List<StockDto> expectedResult = mostAbundantStocks.stream()
+                .map(s -> stockMapper.toDto(s))
+                .toList();
 
         assertThat(actualResult).hasSize(expectedResult.size());
         Assertions.assertEquals(actualResult, expectedResult);

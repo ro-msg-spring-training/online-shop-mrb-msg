@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.SingleLocationStrategy;
+import ro.msg.learning.shop.util.StockMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,18 +28,25 @@ public class SingleLocationStrategyTest extends AbstractStrategyTest{
     @InjectMocks
     private SingleLocationStrategy singleLocationStrategy;
 
+    private StockMapper stockMapper;
+
     @BeforeEach
     public void setUp() {
+        this.stockMapper = new StockMapper();
         singleLocationStrategy = new SingleLocationStrategy(stockRepository);
         super.setUp();
     }
     @Test
-    public void findLocation_StocksFound() {
+    public void testFindStocks_WithSingleStrategy_SingleLocationStocksFound() {
 
         when(stockRepository.findByProductIdAndQuantity(any(UUID.class), anyInt()))
-                .thenReturn(resultingStockList1).thenReturn(resultingStockList2);
+                .thenReturn(List.of(stock1)).thenReturn(List.of(stock3));
 
         List<StockDto> actualResult = singleLocationStrategy.findLocation(orderedProducts);
+
+        List<StockDto> expectedResult = singleLocationStocks.stream()
+                .map(s -> stockMapper.toDto(s))
+                .toList();
 
         assertThat(actualResult).hasSize(expectedResult.size());
         Assertions.assertEquals(actualResult, expectedResult);
