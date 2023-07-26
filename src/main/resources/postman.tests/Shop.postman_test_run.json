@@ -1,0 +1,146 @@
+{
+	"id": "c4cf0977-ea60-409e-a4bb-32eb91db23ee",
+	"name": "Shop",
+	"timestamp": "2023-07-26T11:09:36.172Z",
+	"collection_id": "28486452-c95762bf-f6d1-4cb2-90d4-ecabeb0f22d0",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 4,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2023-07-26T11:09:35.667Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "a9129908-aa6e-43d8-a0ef-ad82fcea117f",
+			"name": "create order succesfully",
+			"url": "http://localhost:8080/shop/orders",
+			"time": 17,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				17
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "f5f53b2c-4071-4998-bcd7-6307f41db4f2",
+			"name": "create order - missing stock",
+			"url": "http://localhost:8080/shop/orders",
+			"time": 7,
+			"responseCode": {
+				"code": 500,
+				"name": "Internal Server Error"
+			},
+			"tests": {
+				"Status code is 500": true
+			},
+			"testPassFailCounts": {
+				"Status code is 500": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				7
+			],
+			"allTests": [
+				{
+					"Status code is 500": true
+				}
+			]
+		},
+		{
+			"id": "0a52ed60-f647-4f6b-ab69-af19adb059a8",
+			"name": "create order - unknown product",
+			"url": "http://localhost:8080/shop/orders",
+			"time": 8,
+			"responseCode": {
+				"code": 500,
+				"name": "Internal Server Error"
+			},
+			"tests": {
+				"Status code is 500": true
+			},
+			"testPassFailCounts": {
+				"Status code is 500": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				8
+			],
+			"allTests": [
+				{
+					"Status code is 500": true
+				}
+			]
+		},
+		{
+			"id": "232236a7-4d59-4938-90d7-83f4ecefb42c",
+			"name": "export stocks for a location",
+			"url": "http://localhost:8080/shop/stocks/export/43eff694-316f-496a-b7d8-3e340716c7f0",
+			"time": 7,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				7
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 39,
+	"collection": {
+		"requests": [
+			{
+				"id": "a9129908-aa6e-43d8-a0ef-ad82fcea117f",
+				"method": "POST"
+			},
+			{
+				"id": "f5f53b2c-4071-4998-bcd7-6307f41db4f2",
+				"method": "POST"
+			},
+			{
+				"id": "0a52ed60-f647-4f6b-ab69-af19adb059a8",
+				"method": "POST"
+			},
+			{
+				"id": "232236a7-4d59-4938-90d7-83f4ecefb42c",
+				"method": "GET"
+			}
+		]
+	}
+}
