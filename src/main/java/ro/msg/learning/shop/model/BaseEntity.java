@@ -19,4 +19,7 @@ public class BaseEntity {
     public UUID getId() {
         return id;
     }
+
+    public void setId(UUID id) {
+    }
 }

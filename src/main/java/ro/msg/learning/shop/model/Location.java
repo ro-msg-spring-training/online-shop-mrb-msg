@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Locations")
+@Builder
 public class Location extends BaseEntity {
 
     private String name;
@@ -29,4 +31,8 @@ public class Location extends BaseEntity {
 
     @OneToMany(mappedBy = "location")
     private Set<Stock> stocks;
+
+    public Location(String name) {
+        this.name = name;
+    }
 }

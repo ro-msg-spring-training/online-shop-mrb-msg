@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ro.msg.learning.shop.model.Location;
 import ro.msg.learning.shop.model.Product;
 import ro.msg.learning.shop.util.LocationSerializer;
@@ -12,6 +13,7 @@ import ro.msg.learning.shop.util.ProductSerializer;
 @AllArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
 public class StockDto {
 
     @JsonSerialize(using = ProductSerializer.class)
