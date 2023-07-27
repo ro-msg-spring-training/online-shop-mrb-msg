@@ -40,7 +40,7 @@ public class SingleLocationStrategyTest extends AbstractStrategyTest{
     public void testFindStocks_WithSingleStrategy_SingleLocationStocksFound() {
 
         when(stockRepository.findByProductIdAndQuantity(any(UUID.class), anyInt()))
-                .thenReturn(List.of(stock1)).thenReturn(List.of(stock3));
+                .thenReturn(List.of(breadStockAr)).thenReturn(List.of(colaStockAr));
 
         List<StockDto> actualResult = singleLocationStrategy.findLocation(orderedProducts);
 

@@ -42,7 +42,7 @@ public class MostAbundantStrategyTest extends AbstractStrategyTest{
     public void testFindStocks_WithAbundantStrategy_MostAbundantStocksFound() {
 
         when(stockRepository.findByProductIdAndQuantityMostAbundant(any(UUID.class), anyInt()))
-                .thenReturn(stock2).thenReturn(stock4);
+                .thenReturn(breadStockTm).thenReturn(colaStockTm);
 
         List<StockDto> actualResult = mostAbundantStrategy.findLocation(orderedProducts);
 

@@ -13,10 +13,10 @@ public abstract class AbstractStrategyTest {
 
     protected List<ProductQuantityDto> orderedProducts;
 
-    protected Stock stock1;
-    protected Stock stock2;
-    protected Stock stock3;
-    protected Stock stock4;
+    protected Stock breadStockAr;
+    protected Stock breadStockTm;
+    protected Stock colaStockAr;
+    protected Stock colaStockTm;
     protected List<Stock> mostAbundantStocks;
     protected List<Stock> singleLocationStocks;
 
@@ -37,29 +37,29 @@ public abstract class AbstractStrategyTest {
         Location ar = Location.builder().name("AR").build();
 
 
-        stock1 = Stock.builder()
+        breadStockAr = Stock.builder()
                 .product(bread)
                 .quantity(10)
                 .location(ar)
                 .build();
-        stock2 = Stock.builder()
+        breadStockTm = Stock.builder()
                 .product(bread)
                 .quantity(11)
                 .location(tm)
                 .build();
-        stock3 = Stock.builder()
+        colaStockAr = Stock.builder()
                 .product(cola)
                 .quantity(10)
                 .location(ar)
                 .build();
-        stock4 = Stock.builder()
+        colaStockTm = Stock.builder()
                 .product(cola)
                 .quantity(11)
                 .location(tm)
                 .build();
 
-        mostAbundantStocks = List.of(stock2, stock4);
-        singleLocationStocks = List.of(stock1, stock3);
+        mostAbundantStocks = List.of(breadStockTm, colaStockTm);
+        singleLocationStocks = List.of(breadStockAr, colaStockAr);
 
 
     }
