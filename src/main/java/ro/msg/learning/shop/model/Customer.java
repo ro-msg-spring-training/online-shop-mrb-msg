@@ -25,6 +25,12 @@ public class Customer extends BaseEntity {
     private String lastName;
 
     @Column(nullable = false)
+    private String userName;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String email;
 
 }
