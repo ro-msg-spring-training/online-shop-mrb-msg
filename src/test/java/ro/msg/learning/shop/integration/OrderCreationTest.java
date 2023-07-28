@@ -1,5 +1,6 @@
 package ro.msg.learning.shop.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,24 +9,23 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ro.msg.learning.shop.ShopApplication;
+import ro.msg.learning.shop.dto.CreateOrderDto;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
-import ro.msg.learning.shop.exception.NoStocksAvailableException;
-import ro.msg.learning.shop.model.Address;
-import ro.msg.learning.shop.model.Order;
-import ro.msg.learning.shop.model.OrderDetail;
 import ro.msg.learning.shop.service.OrderService;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ro.msg.learning.shop.util.TestDataUtil.bread;
 
@@ -42,61 +42,76 @@ public class OrderCreationTest {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    public ObjectMapper mapper;
+
     @Before
     public void beforeEachTest() throws Exception {
-        mvc.perform(get("/test/populate")).andExpect(status().isOk());
+
+        mvc.perform(post("/test/populate")
+                .with(httpBasic("Mira", "1234"))
+                .with(csrf()));
     }
 
     @After
     public void after() throws Exception {
-        mvc.perform(get("/test/clear")).andExpect(status().isOk());
+
+        mvc.perform(get("/test/clear")
+                .with(httpBasic("Mira", "1234")));
     }
 
-    @Test(expected = NoStocksAvailableException.class)
-    public void testCreateOrder_withoutStock_shouldThrowException() {
+    @Test
+    public void testCreateOrder_withoutStock_shouldThrowException() throws Exception {
 
         List<ProductQuantityDto> wantedProducts = List.of(ProductQuantityDto.builder().productId(bread.getId()).quantity(200).build());
 
-        Set<OrderDetail> orderDetails = new HashSet<>();
-
-        orderDetails.add(OrderDetail.builder().product(bread).quantity(200).build());
-
-        var createOrder = Order.builder()
+        var createOrderDto = CreateOrderDto.builder()
                 .createdOn(LocalDate.now())
-                .orderDetails(orderDetails)
-                .deliveryAddress(Address
-                        .builder()
-                        .country("ro")
-                        .city("ar")
-                        .details("")
-                        .build())
+                .products(wantedProducts)
+                .country("ro")
+                .city("ar")
+                .details("")
                 .build();
 
-        orderService.createOrder(createOrder, wantedProducts);
+        var ow = mapper.writer().withDefaultPrettyPrinter();
+        var request = ow.writeValueAsString(createOrderDto);
+
+        var result = mvc.perform(post("/orders")
+                .with(httpBasic("Mira", "1234"))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request)).andReturn();
+
+        String response = result.getResponse().getContentAsString();
+
+        Assert.assertEquals(response, "No stocks available for the requested products.");
 
     }
 
     @Test
-    public void testCreateOrder_withStock_shouldCreateOrder() {
+    public void testCreateOrder_withStock_shouldCreateOrder() throws Exception {
 
         List<ProductQuantityDto> wantedProducts = List.of(ProductQuantityDto.builder().productId(bread.getId()).quantity(1).build());
 
-        Set<OrderDetail> orderDetails = new HashSet<>();
-
-        orderDetails.add(OrderDetail.builder().product(bread).quantity(1).build());
-
-        var createOrder = Order.builder()
+        var createOrderDto = CreateOrderDto.builder()
                 .createdOn(LocalDate.now())
-                .orderDetails(orderDetails)
-                .deliveryAddress(Address
-                        .builder()
-                        .country("ro")
-                        .city("ar")
-                        .details("")
-                        .build())
+                .products(wantedProducts)
+                .country("ro")
+                .city("ar")
+                .details("")
                 .build();
 
-        Order createdOrder = orderService.createOrder(createOrder, wantedProducts);
+        var ow = mapper.writer().withDefaultPrettyPrinter();
+        var request = ow.writeValueAsString(createOrderDto);
+        var result = mvc.perform(post("/orders")
+                        .with(httpBasic("Mira", "1234"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        var createdOrder = mapper.readValue(result.getResponse().getContentAsString(), ro.msg.learning.shop.dto.OrderDto.class);
 
         Assert.assertNotNull(createdOrder);
 

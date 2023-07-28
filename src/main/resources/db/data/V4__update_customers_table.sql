@@ -1,0 +1,5 @@
+ALTER TABLE Customers
+ADD COLUMN user_name VARCHAR(100);
+
+ALTER TABLE Customers
+ADD COLUMN password VARCHAR(100);
