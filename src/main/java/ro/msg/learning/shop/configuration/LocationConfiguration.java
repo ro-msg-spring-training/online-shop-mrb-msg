@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ro.msg.learning.shop.exception.StrategyNotImplementedException;
+import ro.msg.learning.shop.repository.LocationRepository;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.GreedyStrategy;
 import ro.msg.learning.shop.strategy.LocationStrategy;
@@ -25,6 +26,9 @@ public class LocationConfiguration {
     @Autowired
     private StockMapper stockMapper;
 
+    @Autowired
+    private LocationRepository locationRepository;
+
     @Bean
     public LocationStrategy locationStrategy(@Value("${strategy.type}") String strategyType) {
         switch (strategyType) {
@@ -36,7 +40,7 @@ public class LocationConfiguration {
             }
             case "GREEDY" ->
             {
-                return new GreedyStrategy();
+                return new GreedyStrategy(locationRepository, stockRepository, stockMapper);
             }
             default -> throw new StrategyNotImplementedException("Error. No location strategy implemented");
         }

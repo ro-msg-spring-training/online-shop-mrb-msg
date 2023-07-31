@@ -5,4 +5,7 @@ public class NoStocksAvailableException extends RuntimeException {
     public NoStocksAvailableException(String message) {
         super(message);
     }
+
+    public NoStocksAvailableException() {
+    }
 }
