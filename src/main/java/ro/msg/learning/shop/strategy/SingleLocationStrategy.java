@@ -7,6 +7,7 @@ import ro.msg.learning.shop.exception.NoStocksAvailableException;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.StockRepository;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ public class SingleLocationStrategy implements LocationStrategy {
     private final StockRepository stockRepository;
 
     @Override
-    public List<StockDto> findLocation(List<ProductQuantityDto> products) {
+    public List<StockDto> findLocation(List<ProductQuantityDto> products, List<BigDecimal> distances) {
 
         Map<UUID, List<StockDto>> map = new HashMap<>();
 

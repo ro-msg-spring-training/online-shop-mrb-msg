@@ -7,6 +7,7 @@ import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.util.StockMapper;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class MostAbundantStrategy implements LocationStrategy {
     private final StockMapper stockMapper;
 
     @Override
-    public List<StockDto> findLocation(List<ProductQuantityDto> products) {
+    public List<StockDto> findLocation(List<ProductQuantityDto> products, List<BigDecimal> distances) {
 
         List<StockDto> mostAbundantStocks = new ArrayList<>();
 
