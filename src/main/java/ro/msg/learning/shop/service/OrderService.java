@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
+import ro.msg.learning.shop.exception.NoStocksAvailableException;
 import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.OrderDetail;
 import ro.msg.learning.shop.model.Stock;
@@ -41,9 +42,9 @@ public class OrderService {
 
         List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(products, distances);
 
-//        if (stocksToBeOrdered.isEmpty()) {
-//            throw new NoStocksAvailableException("No stocks available");
-//        }
+        if (stocksToBeOrdered.isEmpty()) {
+            throw new NoStocksAvailableException("No stocks available");
+        }
 
         Set<OrderDetail> orderDetails = new HashSet<>();
 
