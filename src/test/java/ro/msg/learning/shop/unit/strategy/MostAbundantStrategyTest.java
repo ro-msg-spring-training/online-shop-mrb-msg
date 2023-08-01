@@ -8,8 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import ro.msg.learning.shop.dto.StockDto;
+import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.MostAbundantStrategy;
+import ro.msg.learning.shop.util.OrderMapper;
 import ro.msg.learning.shop.util.StockMapper;
 
 import java.util.List;
@@ -29,12 +31,16 @@ public class MostAbundantStrategyTest extends AbstractStrategyTest{
     @InjectMocks
     private MostAbundantStrategy mostAbundantStrategy;
 
+    @Mock
     private StockMapper stockMapper;
+
+    @Mock
+    private OrderMapper orderMapper;
 
     @BeforeEach
     public void setUp() {
         this.stockMapper = new StockMapper();
-        mostAbundantStrategy = new MostAbundantStrategy(stockRepository, stockMapper);
+        mostAbundantStrategy = new MostAbundantStrategy(stockRepository, stockMapper, orderMapper);
         super.setUp();
     }
 
@@ -44,7 +50,14 @@ public class MostAbundantStrategyTest extends AbstractStrategyTest{
         when(stockRepository.findByProductIdAndQuantityMostAbundant(any(UUID.class), anyInt()))
                 .thenReturn(breadStockTm).thenReturn(colaStockTm);
 
-        List<StockDto> actualResult = mostAbundantStrategy.findLocation(orderedProducts);
+        when(orderMapper.mapProductQuantityDtoToOrderDetail(any())).thenReturn(orderDetails);
+        when(orderMapper.mapOrderDetailsToProductQuantityDto(any())).thenReturn(orderedProducts);
+
+        Order order = Order.builder()
+                .orderDetails(orderMapper.mapProductQuantityDtoToOrderDetail(orderedProducts))
+                .build();
+
+        List<StockDto> actualResult = mostAbundantStrategy.findLocation(order);
 
         List<StockDto> expectedResult = mostAbundantStocks.stream()
                 .map(s -> stockMapper.toDto(s))

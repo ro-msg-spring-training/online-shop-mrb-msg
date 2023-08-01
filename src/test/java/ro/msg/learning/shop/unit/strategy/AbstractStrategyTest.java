@@ -3,10 +3,12 @@ package ro.msg.learning.shop.unit.strategy;
 import org.junit.Before;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.model.Location;
+import ro.msg.learning.shop.model.OrderDetail;
 import ro.msg.learning.shop.model.Product;
 import ro.msg.learning.shop.model.Stock;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public abstract class AbstractStrategyTest {
@@ -19,6 +21,7 @@ public abstract class AbstractStrategyTest {
     protected Stock colaStockTm;
     protected List<Stock> mostAbundantStocks;
     protected List<Stock> singleLocationStocks;
+    protected Set<OrderDetail> orderDetails;
 
     @Before
     public void setUp() {
@@ -31,6 +34,11 @@ public abstract class AbstractStrategyTest {
         orderedProducts = List.of(
                 ProductQuantityDto.builder().productId(bread.getId()).quantity(10).build(),
                 ProductQuantityDto.builder().productId(cola.getId()).quantity(10).build()
+        );
+
+        orderDetails = Set.of(
+                OrderDetail.builder().quantity(10).product(bread).build(),
+                OrderDetail.builder().quantity(10).product(cola).build()
         );
 
         Location tm = Location.builder().name("TM").build();

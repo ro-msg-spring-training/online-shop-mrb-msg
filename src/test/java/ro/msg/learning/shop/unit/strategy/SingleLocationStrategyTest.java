@@ -8,8 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import ro.msg.learning.shop.dto.StockDto;
+import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.SingleLocationStrategy;
+import ro.msg.learning.shop.util.OrderMapper;
 import ro.msg.learning.shop.util.StockMapper;
 
 import java.util.List;
@@ -28,12 +30,16 @@ public class SingleLocationStrategyTest extends AbstractStrategyTest{
     @InjectMocks
     private SingleLocationStrategy singleLocationStrategy;
 
+    @Mock
     private StockMapper stockMapper;
+
+    @Mock
+    private OrderMapper orderMapper;
 
     @BeforeEach
     public void setUp() {
         this.stockMapper = new StockMapper();
-        singleLocationStrategy = new SingleLocationStrategy(stockRepository);
+        singleLocationStrategy = new SingleLocationStrategy(stockRepository, orderMapper);
         super.setUp();
     }
     @Test
@@ -42,7 +48,14 @@ public class SingleLocationStrategyTest extends AbstractStrategyTest{
         when(stockRepository.findByProductIdAndQuantity(any(UUID.class), anyInt()))
                 .thenReturn(List.of(breadStockAr)).thenReturn(List.of(colaStockAr));
 
-        List<StockDto> actualResult = singleLocationStrategy.findLocation(orderedProducts);
+        when(orderMapper.mapProductQuantityDtoToOrderDetail(any())).thenReturn(orderDetails);
+        when(orderMapper.mapOrderDetailsToProductQuantityDto(any())).thenReturn(orderedProducts);
+
+        Order order = Order.builder()
+                .orderDetails(orderMapper.mapProductQuantityDtoToOrderDetail(orderedProducts))
+                .build();
+
+        List<StockDto> actualResult = singleLocationStrategy.findLocation(order);
 
         List<StockDto> expectedResult = singleLocationStocks.stream()
                 .map(s -> stockMapper.toDto(s))

@@ -1,6 +1,6 @@
 package ro.msg.learning.shop.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
@@ -12,23 +12,27 @@ import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.OrderRepository;
 import ro.msg.learning.shop.repository.StockRepository;
 import ro.msg.learning.shop.strategy.LocationStrategy;
+import ro.msg.learning.shop.util.OrderMapper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final StockRepository stockRepository;
     private final LocationStrategy locationStrategy;
+    private final OrderMapper orderMapper;
+
 
     @Transactional
-    public Order createOrder(Order order, List<ProductQuantityDto> products) {
+    public Order createOrder(Order order) {
 
-        List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(products);
+        List<ProductQuantityDto> products = orderMapper.mapOrderDetailsToProductQuantityDto(order.getOrderDetails());
+        List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(order);
 
         if (stocksToBeOrdered.isEmpty()) {
             throw new NoStocksAvailableException("No stocks available");
