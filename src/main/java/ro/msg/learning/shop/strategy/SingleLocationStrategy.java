@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.exception.NoStocksAvailableException;
+import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.StockRepository;
+import ro.msg.learning.shop.util.OrderMapper;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.UUID;
 public class SingleLocationStrategy implements LocationStrategy {
 
     private final StockRepository stockRepository;
+    private final OrderMapper orderMapper;
 
     @Override
-    public List<StockDto> findLocation(List<ProductQuantityDto> products, List<BigDecimal> distances) {
+    public List<StockDto> findLocation(Order order) {
 
+        List<ProductQuantityDto> products = orderMapper.mapOrderDetailsToProductQuantityDto(order.getOrderDetails());
         Map<UUID, List<StockDto>> map = new HashMap<>();
 
         products.forEach(p -> {

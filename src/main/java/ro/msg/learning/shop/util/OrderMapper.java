@@ -4,12 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ro.msg.learning.shop.dto.CreateOrderDto;
 import ro.msg.learning.shop.dto.OrderDto;
+import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.model.Address;
 import ro.msg.learning.shop.model.Order;
+import ro.msg.learning.shop.model.OrderDetail;
+import ro.msg.learning.shop.repository.ProductRepository;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class OrderMapper {
+
+    private final ProductRepository productRepository;
 
     public Order toEntity(OrderDto createOrderDto) {
         return Order.builder()
@@ -28,6 +37,7 @@ public class OrderMapper {
                         .city(createOrderDto.getCity())
                         .details(createOrderDto.getDetails())
                         .build())
+                .orderDetails(mapProductQuantityDtoToOrderDetail(createOrderDto.getProducts()))
                 .build();
     }
 
@@ -50,4 +60,20 @@ public class OrderMapper {
                 .details(order.getDeliveryAddress().getDetails())
                 .build();
     }
+
+    private Set<OrderDetail> mapProductQuantityDtoToOrderDetail(List<ProductQuantityDto> products) {
+        return products.stream().map(p -> OrderDetail.builder()
+                        .product(productRepository.findById(p.getProductId()).get())
+                        .quantity(p.getQuantity()).build())
+                .collect(Collectors.toSet());
+    }
+
+    public List<ProductQuantityDto> mapOrderDetailsToProductQuantityDto(Set<OrderDetail> orderDetails) {
+        return orderDetails.stream().map(o -> ProductQuantityDto.builder()
+                .quantity(o.getQuantity())
+                .productId(o.getProduct().getId())
+                .build())
+                .toList();
+    }
+
 }

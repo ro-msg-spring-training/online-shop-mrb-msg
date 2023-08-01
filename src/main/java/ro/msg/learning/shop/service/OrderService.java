@@ -11,11 +11,9 @@ import ro.msg.learning.shop.model.OrderDetail;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.OrderRepository;
 import ro.msg.learning.shop.repository.StockRepository;
-import ro.msg.learning.shop.strategy.GreedyStrategy;
 import ro.msg.learning.shop.strategy.LocationStrategy;
-import ro.msg.learning.shop.util.RouteMatrixUtil;
+import ro.msg.learning.shop.util.OrderMapper;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,20 +25,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final StockRepository stockRepository;
     private final LocationStrategy locationStrategy;
-    private final LocationService locationService;
-    private final RouteMatrixUtil routeMatrixUtil;
+    private final OrderMapper orderMapper;
+
 
     @Transactional
-    public Order createOrder(Order order, List<ProductQuantityDto> products) {
+    public Order createOrder(Order order) {
 
-        List<BigDecimal> distances = null;
-
-        if (locationStrategy.getClass().equals(GreedyStrategy.class)) {
-            var allLocations = locationService.getAllLocationsAddresses();
-            distances = routeMatrixUtil.getDistancesFromLocations(order.getDeliveryAddress(), allLocations);
-        }
-
-        List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(products, distances);
+        List<ProductQuantityDto> products = orderMapper.mapOrderDetailsToProductQuantityDto(order.getOrderDetails());
+        List<StockDto> stocksToBeOrdered = locationStrategy.findLocation(order);
 
         if (stocksToBeOrdered.isEmpty()) {
             throw new NoStocksAvailableException("No stocks available");
