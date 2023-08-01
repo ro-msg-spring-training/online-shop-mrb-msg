@@ -1,15 +1,20 @@
 package ro.msg.learning.shop.strategy;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ro.msg.learning.shop.dto.ProductQuantityDto;
 import ro.msg.learning.shop.dto.StockDto;
 import ro.msg.learning.shop.exception.NoStocksAvailableException;
+import ro.msg.learning.shop.model.Address;
 import ro.msg.learning.shop.model.Location;
+import ro.msg.learning.shop.model.Order;
 import ro.msg.learning.shop.model.Stock;
 import ro.msg.learning.shop.repository.LocationRepository;
 import ro.msg.learning.shop.repository.StockRepository;
+import ro.msg.learning.shop.service.LocationService;
+import ro.msg.learning.shop.util.OrderMapper;
+import ro.msg.learning.shop.util.RouteMatrixUtil;
 import ro.msg.learning.shop.util.StockMapper;
 
 import java.math.BigDecimal;
@@ -21,15 +26,33 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@AllArgsConstructor
+@NoArgsConstructor
 public class GreedyStrategy implements LocationStrategy {
 
     private LocationRepository locationRepository;
     private StockRepository stockRepository;
     private StockMapper stockMapper;
+    private LocationService locationService;
+    private RouteMatrixUtil routeMatrixUtil;
+    private OrderMapper orderMapper;
+
+    public GreedyStrategy(LocationRepository locationRepository, StockRepository stockRepository, StockMapper stockMapper, LocationService locationService, RouteMatrixUtil routeMatrixUtil, OrderMapper orderMapper) {
+        this.locationRepository = locationRepository;
+        this.stockRepository = stockRepository;
+        this.stockMapper = stockMapper;
+        this.locationService = locationService;
+        this.routeMatrixUtil = routeMatrixUtil;
+        this.orderMapper = orderMapper;
+    }
 
     @Override
-    public List<StockDto> findLocation(List<ProductQuantityDto> products, List<BigDecimal> distances) {
+    public List<StockDto> findLocation(Order order) {
+
+        Address deliveryAddress = order.getDeliveryAddress();
+        List<ProductQuantityDto> products = orderMapper.mapOrderDetailsToProductQuantityDto(order.getOrderDetails());
+
+        var allLocationsAddresses = locationService.getAllLocationsAddresses();
+        List<BigDecimal> distances = routeMatrixUtil.getDistancesFromLocations(deliveryAddress, allLocationsAddresses);
 
         List<StockDto> toBeOrdered = new ArrayList<>();
 

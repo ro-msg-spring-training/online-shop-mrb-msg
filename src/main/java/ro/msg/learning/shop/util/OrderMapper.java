@@ -61,7 +61,7 @@ public class OrderMapper {
                 .build();
     }
 
-    private Set<OrderDetail> mapProductQuantityDtoToOrderDetail(List<ProductQuantityDto> products) {
+    public Set<OrderDetail> mapProductQuantityDtoToOrderDetail(List<ProductQuantityDto> products) {
         return products.stream().map(p -> OrderDetail.builder()
                         .product(productRepository.findById(p.getProductId()).get())
                         .quantity(p.getQuantity()).build())
