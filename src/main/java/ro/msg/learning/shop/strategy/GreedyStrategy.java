@@ -19,6 +19,7 @@ import ro.msg.learning.shop.util.StockMapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -62,14 +63,13 @@ public class GreedyStrategy implements LocationStrategy {
         distanceToLocations
                 .forEach(l -> {
                     Set<StockDto> availableStocksPerLocation = getAvailableStocksPerLocation(l.getLocation(), products);
-                    if (availableStocksPerLocation != null) {
-                        if (availableStocksPerLocation.size() == products.size()) {
+                    if (availableStocksPerLocation != null && (availableStocksPerLocation.size() == products.size())) {
                             toBeOrdered.addAll(availableStocksPerLocation);
-                        }
+
                     }
                 });
 
-        if (toBeOrdered.size() == 0) throw new NoStocksAvailableException();
+        if (toBeOrdered.isEmpty()) throw new NoStocksAvailableException("No stocks available");
 
         return toBeOrdered.subList(0, products.size());
     }
@@ -84,7 +84,7 @@ public class GreedyStrategy implements LocationStrategy {
 
         if (stocks.size() == products.size()) {
             return stocks.stream().map(s -> stockMapper.toDto(s)).collect(Collectors.toSet());
-        } else return null;
+        } else return Collections.emptySet();
 
     }
 
