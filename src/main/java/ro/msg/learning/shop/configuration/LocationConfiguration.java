@@ -55,7 +55,7 @@ public class LocationConfiguration {
             case GREEDY -> {
                 return new GreedyStrategy(locationRepository, stockRepository, stockMapper, locationService, routeMatrixUtil, orderMapper);
             }
-            default -> throw new StrategyNotImplementedException("Error. No location strategy implemented");
+            default -> throw new StrategyNotImplementedException("No location strategy implemented");
         }
     }
 

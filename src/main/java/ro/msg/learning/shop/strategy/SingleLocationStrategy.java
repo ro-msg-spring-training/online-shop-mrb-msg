@@ -52,14 +52,12 @@ public class SingleLocationStrategy implements LocationStrategy {
             }
         }
 
-        List<StockDto> list = map.entrySet().stream()
+        return map.entrySet().stream()
                 .filter(e -> e.getValue().size() == products.size())
                 .findFirst()
                 .map(Map.Entry::getValue)
                 .orElse(new ArrayList<>())
                 .stream().toList();
-
-        return list;
 
     }
 }

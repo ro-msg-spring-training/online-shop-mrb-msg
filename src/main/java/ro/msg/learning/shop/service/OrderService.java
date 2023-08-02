@@ -40,26 +40,22 @@ public class OrderService {
 
         Set<OrderDetail> orderDetails = new HashSet<>();
 
-        stocksToBeOrdered.forEach(stock -> {
-            products.forEach(product -> {
-                if (stock.getProduct().getId().equals(product.getProductId())) {
-                    orderDetails.add(new OrderDetail(stock.getProduct(), product.getQuantity(), stock.getLocation()));
-                }
-            });
-        });
+        stocksToBeOrdered.forEach(stock -> products.forEach(product -> {
+            if (stock.getProduct().getId().equals(product.getProductId())) {
+                orderDetails.add(new OrderDetail(stock.getProduct(), product.getQuantity(), stock.getLocation()));
+            }
+        }));
 
         Order toBeSaved = new Order();
         toBeSaved.setCreatedOn(order.getCreatedOn());
         toBeSaved.setOrderDetails(orderDetails);
         toBeSaved.setDeliveryAddress(order.getDeliveryAddress());
 
-        products.forEach(p -> {
-            stocksToBeOrdered.forEach(s -> {
-                if (p.getProductId().equals(s.getProduct().getId())) {
-                    updateStock(s, p.getQuantity());
-                }
-            });
-        });
+        products.forEach(p -> stocksToBeOrdered.forEach(s -> {
+            if (p.getProductId().equals(s.getProduct().getId())) {
+                updateStock(s, p.getQuantity());
+            }
+        }));
 
         return orderRepository.save(toBeSaved);
 

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ro.msg.learning.shop.dto.RevenueDto;
 import ro.msg.learning.shop.service.RevenueService;
 import ro.msg.learning.shop.util.RevenueMapper;
-
 import java.time.LocalDate;
 import java.util.List;
 
