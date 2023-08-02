@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Entity
@@ -31,8 +32,14 @@ public class OrderDetail extends BaseEntity {
 
     private Integer quantity;
 
-    public OrderDetail(Product product, Integer quantity) {
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    @JsonIgnore
+    private Location shippedFrom;
+
+    public OrderDetail(Product product, Integer quantity, Location shippedFrom) {
         this.product = product;
         this.quantity = quantity;
+        this.shippedFrom = shippedFrom;
     }
 }

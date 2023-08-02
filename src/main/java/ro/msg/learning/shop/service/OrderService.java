@@ -43,7 +43,7 @@ public class OrderService {
         stocksToBeOrdered.forEach(stock -> {
             products.forEach(product -> {
                 if (stock.getProduct().getId().equals(product.getProductId())) {
-                    orderDetails.add(new OrderDetail(stock.getProduct(), product.getQuantity()));
+                    orderDetails.add(new OrderDetail(stock.getProduct(), product.getQuantity(), stock.getLocation()));
                 }
             });
         });
